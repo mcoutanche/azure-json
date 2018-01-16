@@ -1,4 +1,4 @@
-#ADFS Template 
+# ADFS Template
 
   2x DC
   2x ADFS
