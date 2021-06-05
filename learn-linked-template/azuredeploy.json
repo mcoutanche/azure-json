@@ -23,6 +23,13 @@
       "metadata": {
         "description": "The Runtime stack of current web app"
       }
+    },
+    "publicIPAddressType": {
+      "type": "string",
+      "defaultValue": "static",
+      "metadata": {
+        "description": "Specify public IP type."
+      }
     }
   },
   "variables": {
@@ -33,7 +40,7 @@
   },
   "resources": [
     {
-      "name": "linkedTemplate",
+      "name": "linkedStorageAccountTemplate",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
       "properties": {
@@ -66,6 +73,9 @@
           },
           "location": {
             "value": "[parameters('location')]"
+          },
+          "publicIPAddressType": {
+            "value": "[parameters('publicIPAddressType')]"
           }
         }
       }
