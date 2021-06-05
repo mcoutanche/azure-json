@@ -30,9 +30,3 @@ Resource properties:
 type:           Type of the resource. A combination of the namespace of the resource provider and the resource type such as Microsoft.Storage/storageAccounts.
 apiVersion:     Version of the REST API to use for creating the resource. Each resource provider publishes its own API versions, so this value is specific to the type.
 name:           Name of the resource.
-
-Local template  
-Linked temaplte 
-Pipeline
-
-modularize the template by creating a linked template, you store the linked template in a storage account, and secure the linked template by using SAS token, and you learn how to create a DevOps pipeline to deploy templates.

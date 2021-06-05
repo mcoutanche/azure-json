@@ -64,8 +64,6 @@ Select-AzSubscription -Subscription 06f4a48d-f71c-4bd4-8883-524876d25a2c
       -Blob $linkedPublicIPFileName `
       -Context $context
   
-Write-Host "Press [ENTER] to continue ..."
-
 # deploy linked templates from storage account
 
 # $projectName = Read-Host -Prompt "Enter the same project name:"   # This name is used to generate names for Azure resources, such as storage account name.
@@ -87,7 +85,7 @@ $newSas = $sasToken.substring(1)
 
 
 New-AzResourceGroupDeployment `
-  -Name DeployLinkedTemplate `
+  -Name DeployLinkedTemplates `
   -ResourceGroupName $resourceGroupName `
   -TemplateUri $mainTemplateUri `
   -QueryString $newSas `
