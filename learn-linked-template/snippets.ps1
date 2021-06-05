@@ -52,7 +52,13 @@ Select-AzSubscription -Subscription 06f4a48d-f71c-4bd4-8883-524876d25a2c
   
   Set-AzStorageBlobContent `
       -Container $containerName `
-      -File "$home/$linkedFileName" `
+      -File "$home/$linkedStorageFileName" `
+      -Blob $linkedFileName `
+      -Context $context
+
+  Set-AzStorageBlobContent `
+      -Container $containerName `
+      -File "$home/$linkedPublicIPFileName" `
       -Blob $linkedFileName `
       -Context $context
   
