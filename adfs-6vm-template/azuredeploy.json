@@ -449,7 +449,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('deployNsgsUrl')]",
+          "uri": "[variables('deployNsgsUrl')]",deployPublicIPs
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
