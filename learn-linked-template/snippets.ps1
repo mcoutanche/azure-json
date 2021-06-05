@@ -16,14 +16,17 @@ Select-AzSubscription -Subscription 06f4a48d-f71c-4bd4-8883-524876d25a2c
   $containerName = "templates" # The name of the Blob container to be created.
   
   $mainTemplateURL = "https://raw.githubusercontent.com/mcoutanche/azure-json/master/learn-linked-template/azuredeploy.json"
-  $linkedTemplateURL = "https://raw.githubusercontent.com/mcoutanche/azure-json/master/learn-linked-template/linkedStorageAccount.json"
+  $linkedStorageTemplateURL = "https://raw.githubusercontent.com/mcoutanche/azure-json/master/learn-linked-template/linkedStorageAccount.json"
+  $linkedPublicIPTemplateURL = "https://raw.githubusercontent.com/mcoutanche/azure-json/master/learn-linked-template/linkedPublicIPAccount.json"
   
   $mainFileName = "azuredeploy.json" # A file name used for downloading and uploading the main template.Add-PSSnapin
-  $linkedFileName = "linkedStorageAccount.json" # A file name used for downloading and uploading the linked template.
+  $linkedStorageFileName = "linkedStorageAccount.json" # A file name used for downloading and uploading the linked storage accounttemplate.
+  $linkedPublicIPFileName = "linkedStorageAccount.json" # A file name used for downloading and uploading the linked public IP template.
   
   # Download the templates
   Invoke-WebRequest -Uri $mainTemplateURL -OutFile "C:\Users\Michael.Coutanche\OneDrive\GitHub\file-cache\$mainFileName"
-  Invoke-WebRequest -Uri $linkedTemplateURL -OutFile "C:\Users\Michael.Coutanche\OneDrive\GitHub\file-cache\$linkedFileName"
+  Invoke-WebRequest -Uri $linkedStorageTemplateURL -OutFile "C:\Users\Michael.Coutanche\OneDrive\GitHub\file-cache\$linkedStorageFileName"
+  Invoke-WebRequest -Uri $linkedPublicIPTemplateURL -OutFile "C:\Users\Michael.Coutanche\OneDrive\GitHub\file-cache\$linkedPublicIPFileName"
   
   # Create a resource group
   New-AzResourceGroup -Name $resourceGroupName -Location $location
