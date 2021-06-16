@@ -1,0 +1,45 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "projectName": {
+            "value": "mdc"
+        },
+        "stage": {
+            "value": "prod"
+        },
+        "adminUsername": {
+            "value": "azadmin"
+        },
+        "adminPassword": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/06f4a48d-f71c-4bd4-8883-524876d25a2c/resourceGroups/CANCOMUKDEMO-MDC/providers/Microsoft.KeyVault/vaults/cancomukdemo-kv"
+                },
+                "secretName": "vmAdminPassword"
+            }
+        },
+        "vnetAddressPrefix": {
+            "value": "10.0.0.0/16"
+        },
+        "subnetsConfiguration": {
+            "value": [
+                {
+                    "name": "AzureBastionSubnett",
+                    "addressPrefix": "10.0.0.0/24"
+                },
+                {
+                    "name": "private",
+                    "addressPrefix": "10.0.1.0/24"
+                },
+                {
+                    "name": "public",
+                    "addressPrefix": "10.0.2.0/24"
+                }
+            ]
+        },
+        "virtualMachineSubnet": {
+            "value": "private"
+        }
+    }
+}

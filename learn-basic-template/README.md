@@ -11,6 +11,7 @@ resources:      Contains the resources you want to deploy or update. Currently, 
 parameters      you can use to pass in name, config details about a service 
 functions       auto adds location from resource group service being deployed [resourceGroup().location]
 variables       variable to your template that creates a unique name 
+functions       does things i.e. concat joins two items (can make own) 
 outputs         use outputs to return values from the template. For example, it might be helpful to get the endpoints for your new storage account.
 
 parameter files:
@@ -30,3 +31,6 @@ Resource properties:
 type:           Type of the resource. A combination of the namespace of the resource provider and the resource type such as Microsoft.Storage/storageAccounts.
 apiVersion:     Version of the REST API to use for creating the resource. Each resource provider publishes its own API versions, so this value is specific to the type.
 name:           Name of the resource.
+
+creds from key vault 
+DSC - not done much - in the past I've domain joined VMs or installed features like IIS but not for a while so would have to refresh my mind. 

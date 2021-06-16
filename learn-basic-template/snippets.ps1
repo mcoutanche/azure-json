@@ -31,3 +31,15 @@ New-AzResourceGroupDeployment `
   -ResourceGroupName myResourceGroupDev `
   -TemplateFile $templateFile `
   -TemplateParameterFile $parameterFile
+
+
+# Extras 
+# Adding key vault secrets 
+
+$kvName = '*AzureDSCDemoKv*'
+$vmAdminUserNameSec = ConvertTo-SecureString -String 'adam' -AsPlainText -Force
+$vmAdminPasswordSec = ConvertTo-SecureString -String 'I like azure.' -AsPlainText -Force
+$encSasToken = ConvertTo-SecureString -String 'I like azure.' -AsPlainText -Force
+Set-AzKeyVaultSecret -VaultName $kvName -Name DefaultAdminUsername -SecretValue $vmAdminUserNameSec
+Set-AzKeyVaultSecret -VaultName $kvName -Name DefaultAdminPassword -SecretValue $vmAdminPasswordSec
+Set-AzKeyVaultSecret -VaultName $kvName -Name SASToken -SecretValue $encSasToken

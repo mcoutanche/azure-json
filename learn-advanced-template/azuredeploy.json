@@ -1,0 +1,248 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "projectName": {
+        "type": "string"
+      },
+      "location": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]"
+      },
+      "stage": {
+        "type": "string",
+        "defaultValue": "prod",
+        "allowedValues": [
+          "prod",
+          "dev",
+          "test",
+          "uat"
+        ]
+      },
+      "vmSize": {
+        "type": "string",
+        "defaultValue": "Standard_d4s_v3",
+        "allowedValues": [
+          "Standard_d4s_v3"
+        ]
+      },
+      "virtualMachineSubnet": {
+        "type": "string"
+      },
+      "vnetAddressPrefix": {
+        "type": "string"
+      },
+      "subnetsConfiguration": {
+            "type": "array"
+        },
+      "OSVersion": {
+        "type": "string",
+        "defaultValue": "2019-Datacenter-smalldisk",
+        "allowedValues": [
+          "2008-R2-SP1",
+          "2012-Datacenter",
+          "2012-R2-Datacenter",
+          "2016-Datacenter",
+          "2019-Datacenter",
+          "2019-Datacenter-smalldisk"
+        ],
+        "metadata": {
+          "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version."
+        }
+      },
+      "adminUsername": {
+        "type": "string"
+      },
+      "adminPassword": {
+        "type": "string"
+      },   
+      "publicIPName": {    
+        "type": "string",
+        "defaultValue": "[concat(parameters('projectName'), parameters('stage'), '-pip')]"
+      },
+      "publicIPAllocationMethod": {
+        "type": "string",
+        "defaultValue": "Dynamic",
+        "allowedValues": [
+          "Dynamic",
+          "Static"
+        ],
+        "metadata": {
+          "description": "Allocation method for the Public IP used to access the Virtual Machine."
+        }
+      },
+      "dnsLabelPrefix": {
+        "type": "string",
+        "defaultValue": "[toLower(concat(parameters('projectName'),'-', uniqueString(resourceGroup().id, parameters('stage'))))]",
+        "metadata": {
+          "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
+        }
+      },
+      "publicIPSku": {
+        "type": "string",
+        "defaultValue": "Basic",
+        "allowedValues": [
+          "Basic",
+          "Standard"
+        ],
+        "metadata": {
+          "description": "SKU for the Public IP used to access the Virtual Machine."
+        }
+      }
+    },
+    "variables": {
+     "diagStorageAccountName": "[concat(parameters('projectName'), parameters('stage'), 'diag')]",
+     "virtualNetworkName": "[concat(parameters('projectName'), '-', parameters('stage'), '-vnet')]",
+     "nicName": "[concat(variables('virtualMachineName'), '-nic')]",
+     "virtualMachineName": "[concat(parameters('projectName'), parameters('stage'), '-vm')]"
+    },
+    "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('virtualNetworkName')]",
+      "apiVersion": "2020-05-01",
+      "location": "[parameters('location')]",
+      "properties": {
+          "addressSpace": {
+              "addressPrefixes": [
+                "[parameters('vnetAddressPrefix')]"
+              ]
+          },
+          "copy": [
+            {
+            "name": "subnets",
+            "count": "[length(parameters('subnetsConfiguration'))]",
+                        "input": {
+                            "name": "[parameters('subnetsConfiguration')[copyIndex('subnets')].name]",
+                            "properties": {
+                                "addressPrefix": "[parameters('subnetsConfiguration')[copyIndex('subnets')].addressPrefix]"
+                            }
+                        }
+                    }
+                ]
+            }  
+    },
+  {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('diagStorageAccountName')]",
+      "apiVersion": "2019-06-01",
+      "location": "[parameters('location')]",
+      "sku": {"name": "Standard_LRS"},
+      "kind": "StorageV2",
+      "tags": {
+          "displayName": "[variables('diagStorageAccountName')]"
+      }
+  },
+  {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2020-06-01",
+      "name": "[parameters('publicIPName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('publicIPSku')]"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "[parameters('publicIPAllocationMethod')]",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('dnsLabelPrefix')]"
+        }
+      }
+    },
+  {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('nicName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPName'))]"
+              },
+              "subnet": {
+                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName')),'/subnets/', parameters('virtualMachineSubnet'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+ {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('virtualMachineName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('diagStorageAccountName'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('virtualMachineName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "[parameters('OSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(variables('virtualMachineName'), '-osDisk')]",
+            "createOption": "FromImage",
+            "managedDisk": {
+              "storageAccountType": "StandardSSD_LRS"
+            }
+          },
+          "dataDisks": [
+            {
+              "name": "[concat(variables('virtualMachineName'), '-dataDisk')]",
+              "diskSizeGB": 1023,
+              "lun": 0,
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true,
+            "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('diagStorageAccountName'))).primaryEndpoints.blob]"
+          }
+        }
+      }
+    }
+],
+    "outputs": {
+      "copy-function-result": {
+            "type": "array",
+            "copy": {
+                "count": "[length(parameters('subnetsConfiguration'))]",
+                "input": {
+                    "name": "[parameters('subnetsConfiguration')[copyIndex()].name]",
+                    "properties": {
+                        "addressPrefix": "[parameters('subnetsConfiguration')[copyIndex()].addressPrefix]"
+                    }
+                }
+            }
+        }
+    }
+}

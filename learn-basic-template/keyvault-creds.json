@@ -1,0 +1,37 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+            "value": "azuredscdemostorage"
+        },
+        "setupScriptContainerName": {
+            "value": "envsetupscripts"
+        },
+        "storageAccountSasToken": {
+            "value": ""
+        },
+        "vmssInstanceCount": {
+            "value": 2
+        },
+        "vmSize": {
+            "value": "Standard_D1"
+        },
+        "adminUsername": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/[your subscription id]/resourceGroups/AzureDSCDemo/providers/Microsoft.KeyVault/vaults/AzureDSCDemoKv"
+                },
+                "secretName": "DefaultAdminUsername"
+            }
+        },
+        "adminPassword": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/[your subscription id]/resourceGroups/AzureDSCDemo/providers/Microsoft.KeyVault/vaults/AzureDSCDemoKv"
+                },
+                "secretName": "DefaultAdminPassword"
+            }
+        }
+    }
+}

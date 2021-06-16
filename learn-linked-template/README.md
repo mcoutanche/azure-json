@@ -11,6 +11,7 @@ resources:      Contains the resources you want to deploy or update. Currently, 
 parameters      you can use to pass in name, config details about a service 
 functions       auto adds location from resource group service being deployed [resourceGroup().location]
 variables       variable to your template that creates a unique name 
+functions       does things i.e. concat joins two items (can make own) 
 outputs         use outputs to return values from the template. For example, it might be helpful to get the endpoints for your new storage account.
 
 parameter files:
@@ -34,3 +35,5 @@ name:           Name of the resource.
 
 Linked template modularize the template by creating a linked template, you store the linked template in a storage account, and secure the linked template by using SAS 
                 token, and you learn how to create a DevOps pipeline to deploy templates.
+
+

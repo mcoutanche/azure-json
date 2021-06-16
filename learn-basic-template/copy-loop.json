@@ -1,0 +1,79 @@
+# copy loop cant exceed 800
+
+
+"copy": {
+    "name": "<name-of-loop>",
+    "count": <number-of-iterations>,
+    "mode": "serial" <or> "parallel",
+    "batchSize": <number-to-deploy-serially>
+  }
+
+# The name property is any value that identifies the loop. 
+# The count property specifies the number of iterations you want for the resource type.
+# Use the mode and batchSize properties to specify if the resources are deployed in parallel or in sequence. 
+# These properties are described in Serial or Parallel.
+
+# Example
+ {
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "storageCount": {
+        "type": "int",
+        "defaultValue": 2
+      }
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Storage/storageAccounts",
+        "apiVersion": "2019-04-01",
+        "name": "[concat(copyIndex(),'storage', uniqueString(resourceGroup().id))]",
+        "location": "[resourceGroup().location]",
+        "sku": {
+          "name": "Standard_LRS"
+        },
+        "kind": "Storage",
+        "properties": {},
+        "copy": {
+          "name": "storagecopy",
+          "count": "[parameters('storageCount')]"
+        }
+      }
+    ]
+  } 
+
+  # creates a storage account for each name in the array 
+
+  {
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageNames": {
+            "type": "array",
+            "defaultValue": [
+              "contoso",
+              "fabrikam",
+              "coho"
+            ]
+        }
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Storage/storageAccounts",
+        "apiVersion": "2019-04-01",
+        "name": "[concat(parameters('storageNames')[copyIndex()], uniqueString(resourceGroup().id))]",
+        "location": "[resourceGroup().location]",
+        "sku": {
+          "name": "Standard_LRS"
+        },
+        "kind": "Storage",
+        "properties": {},
+        "copy": {
+          "name": "storagecopy",
+          "count": "[length(parameters('storageNames'))]"
+        }
+      }
+    ],
+    "outputs": {}
+  }
+
